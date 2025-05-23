@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV Загрузчик</title>
+</head>
+<body>
+<h2>Загрузите CSV-файл</h2>
+<form id="uploadForm">
+    <input type="file" id="csvFileInput">
+    <button type="submit" id="uploadButton">Загрузить</button>
+</form>
+
+<h2>Статистика</h2>
+<canvas id="chart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.getElementById("uploadForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Останавливаем стандартную отправку формы
+
+        let fileInput = document.getElementById("csvFileInput").files[0];
+        if (!fileInput) return alert("Выберите файл!");
+
+        let formData = new FormData();
+        formData.append("file", fileInput);
+
+        fetch("http://localhost:8080/upload", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.text())
+            .then(data => {
+                let avg = parseFloat(data.match(/Среднее значение: ([\d.]+)/)?.[1]); // Извлекаем число
+                if (isNaN(avg)) {
+                    console.error("Ошибка: avgValue не число!");
+                    return;
+                }
+                alert("Среднее значение: " + avg);
+                drawChart(avg);
+            })
+            .catch(error => console.error("Ошибка загрузки:", error));
+    });
+
+    let chartInstance = null; // Переменная для хранения графика
+
+    function drawChart(avgValue) {
+        console.log("Среднее значение для графика:", avgValue);
+
+        if (isNaN(parseFloat(avgValue))) {
+            console.error("Ошибка: avgValue не число!");
+            return;
+        }
+
+        let ctx = document.getElementById("chart").getContext("2d");
+
+        // Удаляем старый график, если он уже существует
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Среднее значение"],
+                datasets: [{
+                    label: "Статистика",
+                    data: [parseFloat(avgValue)],
+                    backgroundColor: "rgba(75, 192, 192, 0.6)"
+                }]
+            }
+        });
+
+        chartInstance.update(); // Принудительное обновление графика
+    }
+
+</script>
+</body>
+</html>
