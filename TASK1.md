@@ -7,10 +7,10 @@
    aws --endpoint-url=http://localhost:4566 s3 cp data.csv s3://my-bucket/
 5. Check test file: aws --endpoint-url=http://localhost:4566 s3 ls s3://my-bucket
 6. Run the application
-Additional (for auth): 
-aws configure set aws_access_key_id test
-aws configure set aws_secret_access_key test
-aws configure set default.region us-east-1
+7. Additional (for auth): 
+   aws configure set aws_access_key_id test
+   aws configure set aws_secret_access_key test
+   aws configure set default.region us-east-1
 
  
     
