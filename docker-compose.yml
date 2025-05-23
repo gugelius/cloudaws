@@ -1,0 +1,12 @@
+services:
+  app:
+    build: app
+    environment:
+      - FLASK_DEBUG=1
+  nginx:
+    container_name: nginx
+    build: nginx
+    ports:
+      - 80:80
+    depends_on:
+      - app
